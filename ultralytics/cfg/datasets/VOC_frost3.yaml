@@ -1,0 +1,37 @@
+path: /disk/duanww/VOC_YOLO  
+
+train: # train images (relative to 'path') 16551 images
+  - images/snow_train/3/train2012
+  - images/snow_train/3/train2007
+  - images/snow_train/3/val2012
+  - images/snow_train/3/val2007
+val:  # val images (relative to 'path') 4952 images
+  - images/frost/3
+
+
+
+# Classes
+names:
+  0: aeroplane
+  1: bicycle
+  2: bird
+  3: boat
+  4: bottle
+  5: bus
+  6: car
+  7: cat
+  8: chair
+  9: cow
+  10: diningtable
+  11: dog
+  12: horse
+  13: motorbike
+  14: person
+  15: pottedplant
+  16: sheep
+  17: sofa
+  18: train
+  19: tvmonitor
+
+# 把原来的 download: 部分全部删掉，或者注释掉
+# download: | ...
