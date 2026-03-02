@@ -88,6 +88,7 @@ class Conv(nn.Module):
         """
         return self.act(self.conv(x))
 
+
 # class Conv(nn.Module):
 #     """Standard convolution module with batch normalization and activation.
 
@@ -140,7 +141,6 @@ class Conv(nn.Module):
 #             (torch.Tensor): Output tensor.
 #         """
 #         return self.act(self.conv(x))
-
 
 
 class Conv2(Conv):
