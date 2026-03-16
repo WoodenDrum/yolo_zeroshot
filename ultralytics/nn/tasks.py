@@ -16,7 +16,6 @@ from ultralytics.nn.modules import (
     C1,
     C2,
     C2PSA,
-    C2RobustPSA,
     C3,
     C3TR,
     ELAN1,
@@ -28,12 +27,16 @@ from ultralytics.nn.modules import (
     A2C2f,
     AConv,
     ADown,
+    BMDDown,
+    BMDStem,
+    BMDStemv4,
     Bottleneck,
     BottleneckCSP,
     C2f,
     C2fAttn,
     C2fCIB,
     C2fPSA,
+    C2RobustPSA,
     C3Ghost,
     C3k2,
     C3k2_Universal,
@@ -42,10 +45,10 @@ from ultralytics.nn.modules import (
     CBLinear,
     Classify,
     Concat,
-    ReliabilityGateFusion,
     Conv,
     Conv2,
     ConvTranspose,
+    ConvWithGray,
     Detect,
     DWConv,
     DWConvTranspose2d,
@@ -56,28 +59,25 @@ from ultralytics.nn.modules import (
     HGStem,
     ImagePoolingAttn,
     Index,
+    LPT_C3k2,
     LRPCHead,
     Pose,
+    ReliabilityGateFusion,
     RepC3,
     RepConv,
     RepNCSPELAN4,
     RepVGGDW,
     ResNetLayer,
+    RetinaStem,
     RTDETRDecoder,
     SCDown,
     Segment,
+    SNN_Conv,
     TorchVision,
     WorldDetect,
     YOLOEDetect,
     YOLOESegment,
     v10Detect,
-    BMDStem,
-    RetinaStem,
-    BMDStemv4,
-    BMDDown,
-    ConvWithGray,
-    LPT_C3k2,
-    SNN_Conv,
 )
 from ultralytics.utils import DEFAULT_CFG_DICT, LOGGER, YAML, colorstr, emojis
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
@@ -1595,7 +1595,7 @@ def parse_model(d, ch, verbose=True):
             C2PSA,
             C2RobustPSA,
             A2C2f,
-            ReliabilityGateFusion
+            ReliabilityGateFusion,
         }
     )
     for i, (f, n, m, args) in enumerate(d["backbone"] + d["head"]):  # from, number, module, args
@@ -1648,7 +1648,7 @@ def parse_model(d, ch, verbose=True):
         elif m is Concat:
             c2 = sum(ch[x] for x in f)
         elif m is ReliabilityGateFusion:
-            c1 = [ch[x] for x in f] 
+            c1 = [ch[x] for x in f]
             c2 = c1[0]
             args = [c1, *args]
         elif m in frozenset(
