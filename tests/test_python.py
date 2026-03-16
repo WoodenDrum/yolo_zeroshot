@@ -681,8 +681,9 @@ def test_yoloe():
     model.set_classes(names, model.get_text_pe(names))
     model(SOURCE, conf=0.01)
 
-    from ultralytics import YOLOE
     from ultralytics.models.yolo.yoloe import YOLOEVPSegPredictor
+
+    from ultralytics import YOLOE
 
     # visual-prompts
     visuals = dict(
