@@ -184,8 +184,9 @@ def test_utils_benchmarks():
 @pytest.mark.skipif(not DEVICES, reason="No CUDA devices available")
 def test_predict_sam():
     """Test SAM model predictions using different prompts."""
-    from ultralytics import SAM
     from ultralytics.models.sam import Predictor as SAMPredictor
+
+    from ultralytics import SAM
 
     model = SAM(WEIGHTS_DIR / "sam2.1_b.pt")
     model.info()
