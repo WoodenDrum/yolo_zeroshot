@@ -71,8 +71,9 @@ def test_fastsam(
     run(f"yolo segment val {task} model={model} data={data} imgsz=32")
     run(f"yolo segment predict model={model} source={source} imgsz=32 save save_crop save_txt")
 
-    from ultralytics import FastSAM
     from ultralytics.models.sam import Predictor
+
+    from ultralytics import FastSAM
 
     # Create a FastSAM model
     sam_model = FastSAM(model)  # or FastSAM-x.pt
