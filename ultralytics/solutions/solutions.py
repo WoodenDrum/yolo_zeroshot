@@ -64,7 +64,7 @@ class BaseSolution:
         process: Process method to be implemented by each Solution subclass.
 
     Examples:
-        >>> solution = BaseSolution(model="yolo11n.pt", region=[(0, 0), (100, 0), (100, 100), (0, 100)])
+        >>> solution = BaseSolution(model="yolo26n.pt", region=[(0, 0), (100, 0), (100, 100), (0, 100)])
         >>> solution.initialize_region()
         >>> image = cv2.imread("image.jpg")
         >>> solution.extract_tracks(image)
@@ -106,7 +106,7 @@ class BaseSolution:
 
         # Load Model and store additional information (classes, show_conf, show_label)
         if self.CFG["model"] is None:
-            self.CFG["model"] = "yolo11n.pt"
+            self.CFG["model"] = "yolo26n.pt"
         self.model = YOLO(self.CFG["model"])
         self.names = self.model.names
         self.classes = self.CFG["classes"]
@@ -253,7 +253,7 @@ class BaseSolution:
                 f" {', '.join([f'{v} {self.names[k]}' for k, v in counts.items()])}\n"
                 f"Speed: {track_or_predict_speed:.1f}ms {track_or_predict}, "
                 f"{solution_speed:.1f}ms solution per image at shape "
-                f"(1, {getattr(self.model, 'ch', 3)}, {result.plot_im.shape[0]}, {result.plot_im.shape[1]})\n"
+                f"(1, {getattr(self.model, 'channels', 3)}, {result.plot_im.shape[0]}, {result.plot_im.shape[1]})\n"
             )
         return result
 

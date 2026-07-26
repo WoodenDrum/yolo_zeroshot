@@ -1,0 +1,14 @@
+3Spike
+Copyright (C) 2026 3Spike contributors
+
+This repository contains a modified derivative of the Ultralytics project.
+Upstream project: https://github.com/ultralytics/ultralytics
+Upstream license: GNU Affero General Public License v3.0 (AGPL-3.0)
+
+The 3Spike-specific source and configuration changes are released under the
+same AGPL-3.0 license. This repository is independent of Ultralytics and is
+not affiliated with, endorsed by, or sponsored by Ultralytics. "Ultralytics"
+and related marks belong to their respective owners.
+
+The full license text is provided in LICENSE. Recipients must preserve this
+notice and the license when redistributing or modifying this work.

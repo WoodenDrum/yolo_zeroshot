@@ -1,0 +1,55 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
+# Ultralytics RT-DETR-l hybrid object detection model with P3/8 - P5/32 outputs
+# Model docs: https://docs.ultralytics.com/models/rtdetr
+# Task docs: https://docs.ultralytics.com/tasks/detect
+
+# Parameters
+nc: 80 # number of classes
+scales: # model compound scaling constants, i.e. 'model=rtdetr-l.yaml' will call rtdetr-l.yaml with scale 'l'
+  # [depth, width, max_channels]
+  l: [1.00, 1.00, 1024]
+
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, HGStem, [32, 48]] # 0-P2/4
+  - [-1, 6, HGBlock, [48, 128, 3]] # 1 stage 1
+  - [-1, 1, STS, [256]] # 2
+
+  - [-1, 1, DWConv, [128, 3, 2, 1, False]] # 3-P3/8
+  - [-1, 6, HGBlock, [96, 512, 3]] # 4 stage 2
+  - [-1, 1, STS, [512]] # 5
+
+  - [-1, 1, DWConv, [512, 3, 2, 1, False]] # 6-P4/16
+  - [-1, 6, HGBlock, [192, 1024, 5, True, False]] # 7 cm, c2, k, light, shortcut
+  - [-1, 6, HGBlock, [192, 1024, 5, True, True]] # 8
+  - [-1, 6, HGBlock, [192, 1024, 5, True, True]] # 9 stage 3
+
+  - [-1, 1, DWConv, [1024, 3, 2, 1, False]] # 10-P5/32
+  - [-1, 6, HGBlock, [384, 2048, 5, True, False]] # 11 stage 4
+
+head:
+  - [-1, 1, Conv, [256, 1, 1, None, 1, 1, False]] # 12 input_proj.2
+  - [-1, 1, AIFI, [1024, 8]]
+  - [-1, 1, Conv, [256, 1, 1]] # 14, Y5, lateral_convs.0
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [9, 1, Conv, [256, 1, 1, None, 1, 1, False]] # 16 input_proj.1
+  - [[-2, -1], 1, Concat, [1]]
+  - [-1, 3, RepC3, [256]] # 18, fpn_blocks.0
+  - [-1, 1, Conv, [256, 1, 1]] # 19, Y4, lateral_convs.1
+
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]
+  - [5, 1, Conv, [256, 1, 1, None, 1, 1, False]] # 21 input_proj.0
+  - [[-2, -1], 1, Concat, [1]] # cat backbone P3
+  - [-1, 3, RepC3, [256]] # X3 (23), fpn_blocks.1
+
+  - [-1, 1, Conv, [256, 3, 2]] # 24, downsample_convs.0
+  - [[-1, 19], 1, Concat, [1]] # cat Y4
+  - [-1, 3, RepC3, [256]] # F4 (26), pan_blocks.0
+
+  - [-1, 1, Conv, [256, 3, 2]] # 27, downsample_convs.1
+  - [[-1, 14], 1, Concat, [1]] # cat Y5
+  - [-1, 3, RepC3, [256]] # F5 (29), pan_blocks.1
+
+  - [[23, 26, 29], 1, RTDETRDecoder, [nc]] # RTDETRDecoder(P3, P4, P5)

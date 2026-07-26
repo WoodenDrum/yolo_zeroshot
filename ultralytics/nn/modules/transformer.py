@@ -224,7 +224,7 @@ class AIFI(TransformerEncoderLayer):
             temperature (float): Temperature for the sine/cosine functions.
 
         Returns:
-            (torch.Tensor): Position embedding with shape [1, embed_dim, h*w].
+            (torch.Tensor): Position embedding with shape [1, h*w, embed_dim].
         """
         assert embed_dim % 4 == 0, "Embed dimension must be divisible by 4 for 2D sin-cos position embedding"
         grid_w = torch.arange(w, dtype=torch.float32)
@@ -305,16 +305,16 @@ class TransformerBlock(nn.Module):
         """Forward propagate the input through the transformer block.
 
         Args:
-            x (torch.Tensor): Input tensor with shape [b, c1, w, h].
+            x (torch.Tensor): Input tensor with shape [b, c1, h, w].
 
         Returns:
-            (torch.Tensor): Output tensor with shape [b, c2, w, h].
+            (torch.Tensor): Output tensor with shape [b, c2, h, w].
         """
         if self.conv is not None:
             x = self.conv(x)
-        b, _, w, h = x.shape
+        b, _, h, w = x.shape
         p = x.flatten(2).permute(2, 0, 1)
-        return self.tr(p + self.linear(p)).permute(1, 2, 0).reshape(b, self.c2, w, h)
+        return self.tr(p + self.linear(p)).permute(1, 2, 0).reshape(b, self.c2, h, w)
 
 
 class MLPBlock(nn.Module):
@@ -326,7 +326,7 @@ class MLPBlock(nn.Module):
         Args:
             embedding_dim (int): Input and output dimension.
             mlp_dim (int): Hidden dimension.
-            act (nn.Module): Activation function.
+            act (type): Activation function class.
         """
         super().__init__()
         self.lin1 = nn.Linear(embedding_dim, mlp_dim)
@@ -376,7 +376,7 @@ class MLP(nn.Module):
             hidden_dim (int): Hidden dimension.
             output_dim (int): Output dimension.
             num_layers (int): Number of layers.
-            act (nn.Module): Activation function.
+            act (type): Activation function class.
             sigmoid (bool): Whether to apply sigmoid to the output.
             residual (bool): Whether to use residual connections.
             out_norm (nn.Module, optional): Normalization layer for the output.
@@ -539,12 +539,12 @@ class MSDeformAttn(nn.Module):
 
         Args:
             query (torch.Tensor): Query tensor with shape [bs, query_length, C].
-            refer_bbox (torch.Tensor): Reference bounding boxes with shape [bs, query_length, n_levels, 2], range in [0,
-                1], top-left (0,0), bottom-right (1, 1), including padding area.
+            refer_bbox (torch.Tensor): Reference bounding boxes with shape [bs, query_length, n_levels, 2 or 4], range
+                in [0, 1], top-left (0,0), bottom-right (1, 1), including padding area.
             value (torch.Tensor): Value tensor with shape [bs, value_length, C].
             value_shapes (list): List with shape [n_levels, 2], [(H_0, W_0), (H_1, W_1), ..., (H_{L-1}, W_{L-1})].
-            value_mask (torch.Tensor, optional): Mask tensor with shape [bs, value_length], True for non-padding
-                elements, False for padding elements.
+            value_mask (torch.Tensor, optional): Mask tensor with shape [bs, value_length], True for padding elements,
+                False for non-padding elements.
 
         Returns:
             (torch.Tensor): Output tensor with shape [bs, Length_{query}, C].

@@ -4,61 +4,63 @@ Export a YOLO PyTorch model to other formats. TensorFlow exports authored by htt
 
 Format                  | `format=argument`         | Model
 ---                     | ---                       | ---
-PyTorch                 | -                         | yolo11n.pt
-TorchScript             | `torchscript`             | yolo11n.torchscript
-ONNX                    | `onnx`                    | yolo11n.onnx
-OpenVINO                | `openvino`                | yolo11n_openvino_model/
-TensorRT                | `engine`                  | yolo11n.engine
-CoreML                  | `coreml`                  | yolo11n.mlpackage
-TensorFlow SavedModel   | `saved_model`             | yolo11n_saved_model/
-TensorFlow GraphDef     | `pb`                      | yolo11n.pb
-TensorFlow Lite         | `tflite`                  | yolo11n.tflite
-TensorFlow Edge TPU     | `edgetpu`                 | yolo11n_edgetpu.tflite
-TensorFlow.js           | `tfjs`                    | yolo11n_web_model/
-PaddlePaddle            | `paddle`                  | yolo11n_paddle_model/
-MNN                     | `mnn`                     | yolo11n.mnn
-NCNN                    | `ncnn`                    | yolo11n_ncnn_model/
-IMX                     | `imx`                     | yolo11n_imx_model/
-RKNN                    | `rknn`                    | yolo11n_rknn_model/
-ExecuTorch              | `executorch`              | yolo11n_executorch_model/
-Axelera                 | `axelera`                 | yolo11n_axelera_model/
+PyTorch                 | -                         | yolo26n.pt
+TorchScript             | `torchscript`             | yolo26n.torchscript
+ONNX                    | `onnx`                    | yolo26n.onnx
+OpenVINO                | `openvino`                | yolo26n_openvino_model/
+TensorRT                | `engine`                  | yolo26n.engine
+CoreML                  | `coreml`                  | yolo26n.mlpackage
+TensorFlow SavedModel   | `saved_model`             | yolo26n_saved_model/
+TensorFlow GraphDef     | `pb`                      | yolo26n.pb
+TensorFlow Lite         | `tflite`                  | yolo26n.tflite
+TensorFlow Edge TPU     | `edgetpu`                 | yolo26n_edgetpu.tflite
+TensorFlow.js           | `tfjs`                    | yolo26n_web_model/
+PaddlePaddle            | `paddle`                  | yolo26n_paddle_model/
+MNN                     | `mnn`                     | yolo26n.mnn
+NCNN                    | `ncnn`                    | yolo26n_ncnn_model/
+IMX                     | `imx`                     | yolo26n_imx_model/
+RKNN                    | `rknn`                    | yolo26n_rknn_model/
+ExecuTorch              | `executorch`              | yolo26n_executorch_model/
+Axelera                 | `axelera`                 | yolo26n_axelera_model/
 
 Requirements:
     $ pip install "ultralytics[export]"
 
 Python:
     from ultralytics import YOLO
-    model = YOLO('yolo11n.pt')
+    model = YOLO('yolo26n.pt')
     results = model.export(format='onnx')
 
 CLI:
-    $ yolo mode=export model=yolo11n.pt format=onnx
+    $ yolo mode=export model=yolo26n.pt format=onnx
 
 Inference:
-    $ yolo predict model=yolo11n.pt                 # PyTorch
-                         yolo11n.torchscript        # TorchScript
-                         yolo11n.onnx               # ONNX Runtime or OpenCV DNN with dnn=True
-                         yolo11n_openvino_model     # OpenVINO
-                         yolo11n.engine             # TensorRT
-                         yolo11n.mlpackage          # CoreML (macOS-only)
-                         yolo11n_saved_model        # TensorFlow SavedModel
-                         yolo11n.pb                 # TensorFlow GraphDef
-                         yolo11n.tflite             # TensorFlow Lite
-                         yolo11n_edgetpu.tflite     # TensorFlow Edge TPU
-                         yolo11n_paddle_model       # PaddlePaddle
-                         yolo11n.mnn                # MNN
-                         yolo11n_ncnn_model         # NCNN
-                         yolo11n_imx_model          # IMX
-                         yolo11n_rknn_model         # RKNN
-                         yolo11n_executorch_model   # ExecuTorch
-                         yolo11n_axelera_model      # Axelera
+    $ yolo predict model=yolo26n.pt                 # PyTorch
+                         yolo26n.torchscript        # TorchScript
+                         yolo26n.onnx               # ONNX Runtime or OpenCV DNN with dnn=True
+                         yolo26n_openvino_model     # OpenVINO
+                         yolo26n.engine             # TensorRT
+                         yolo26n.mlpackage          # CoreML (macOS-only)
+                         yolo26n_saved_model        # TensorFlow SavedModel
+                         yolo26n.pb                 # TensorFlow GraphDef
+                         yolo26n.tflite             # TensorFlow Lite
+                         yolo26n_edgetpu.tflite     # TensorFlow Edge TPU
+                         yolo26n_paddle_model       # PaddlePaddle
+                         yolo26n.mnn                # MNN
+                         yolo26n_ncnn_model         # NCNN
+                         yolo26n_imx_model          # IMX
+                         yolo26n_rknn_model         # RKNN
+                         yolo26n_executorch_model   # ExecuTorch
+                         yolo26n_axelera_model      # Axelera
 
 TensorFlow.js:
     $ cd .. && git clone https://github.com/zldrobit/tfjs-yolov5-example.git && cd tfjs-yolov5-example
     $ npm install
-    $ ln -s ../../yolo11n_web_model public/yolo11n_web_model
+    $ ln -s ../../yolo26n_web_model public/yolo26n_web_model
     $ npm start
 """
+
+from __future__ import annotations
 
 import json
 import os
@@ -102,13 +104,17 @@ from ultralytics.utils import (
     callbacks,
     colorstr,
     get_default_args,
+    is_dgx,
+    is_jetson,
 )
 from ultralytics.utils.checks import (
     IS_PYTHON_3_10,
     IS_PYTHON_MINIMUM_3_9,
     check_apt_requirements,
+    check_executorch_requirements,
     check_imgsz,
     check_requirements,
+    check_tensorrt,
     check_version,
     is_intel,
     is_sudo_available,
@@ -119,6 +125,7 @@ from ultralytics.utils.export import (
     onnx2saved_model,
     pb2tfjs,
     tflite2edgetpu,
+    torch2executorch,
     torch2imx,
     torch2onnx,
 )
@@ -132,6 +139,7 @@ from ultralytics.utils.torch_utils import (
     TORCH_1_11,
     TORCH_1_13,
     TORCH_2_1,
+    TORCH_2_3,
     TORCH_2_4,
     TORCH_2_9,
     select_device,
@@ -172,7 +180,7 @@ def export_formats():
         ["IMX", "imx", "_imx_model", True, True, ["int8", "fraction", "nms"]],
         ["RKNN", "rknn", "_rknn_model", False, False, ["batch", "name"]],
         ["ExecuTorch", "executorch", "_executorch_model", True, False, ["batch"]],
-        ["Axelera", "axelera", "_axelera_model", False, False, ["batch", "int8"]],
+        ["Axelera", "axelera", "_axelera_model", False, False, ["batch", "int8", "fraction"]],
     ]
     return dict(zip(["Format", "Argument", "Suffix", "CPU", "GPU", "Arguments"], zip(*x)))
 
@@ -181,6 +189,8 @@ def best_onnx_opset(onnx, cuda=False) -> int:
     """Return max ONNX opset for this torch version with ONNX fallback."""
     if TORCH_2_4:  # _constants.ONNX_MAX_OPSET first defined in torch 1.13
         opset = torch.onnx.utils._constants.ONNX_MAX_OPSET - 1  # use second-latest version for safety
+        if TORCH_2_9:
+            opset = min(opset, 20)  # legacy TorchScript exporter caps at opset 20 in torch 2.9+
         if cuda:
             opset -= 2  # fix CUDA ONNXRuntime NMS squeeze op errors
     else:
@@ -210,7 +220,7 @@ def validate_args(format, passed_args, valid_args):
 
     Args:
         format (str): The export format.
-        passed_args (Namespace): The arguments used during export.
+        passed_args (SimpleNamespace): The arguments used during export.
         valid_args (list): List of valid arguments for the format.
 
     Raises:
@@ -267,7 +277,7 @@ class Exporter:
         pretty_name (str): Formatted model name for display purposes.
         metadata (dict): Model metadata including description, author, version, etc.
         device (torch.device): Device on which the model is loaded.
-        imgsz (tuple): Input image size for the model.
+        imgsz (list): Input image size for the model.
 
     Methods:
         __call__: Main export method that handles the export process.
@@ -287,24 +297,26 @@ class Exporter:
         export_tfjs: Export model to TensorFlow.js format.
         export_rknn: Export model to RKNN format.
         export_imx: Export model to IMX format.
+        export_executorch: Export model to ExecuTorch format.
+        export_axelera: Export model to Axelera format.
 
     Examples:
-        Export a YOLOv8 model to ONNX format
+        Export a YOLO26 model to ONNX format
         >>> from ultralytics.engine.exporter import Exporter
         >>> exporter = Exporter()
-        >>> exporter(model="yolov8n.pt")  # exports to yolov8n.onnx
+        >>> exporter(model="yolo26n.pt")  # exports to yolo26n.onnx
 
         Export with specific arguments
         >>> args = {"format": "onnx", "dynamic": True, "half": True}
         >>> exporter = Exporter(overrides=args)
-        >>> exporter(model="yolov8n.pt")
+        >>> exporter(model="yolo26n.pt")
     """
 
-    def __init__(self, cfg=DEFAULT_CFG, overrides=None, _callbacks=None):
+    def __init__(self, cfg=DEFAULT_CFG, overrides=None, _callbacks: dict | None = None):
         """Initialize the Exporter class.
 
         Args:
-            cfg (str, optional): Path to a configuration file.
+            cfg (str | Path | dict | SimpleNamespace, optional): Configuration file path or configuration object.
             overrides (dict, optional): Configuration overrides.
             _callbacks (dict, optional): Dictionary of callback functions.
         """
@@ -387,6 +399,8 @@ class Exporter:
                 self.args.int8 = True
             if model.task not in {"detect"}:
                 raise ValueError("Axelera export only supported for detection models.")
+            if not self.args.data:
+                self.args.data = "coco128.yaml"  # Axelera default to coco128.yaml
         if imx:
             if not self.args.int8:
                 LOGGER.warning("IMX export requires int8=True, setting int8=True.")
@@ -401,6 +415,26 @@ class Exporter:
         if not hasattr(model, "names"):
             model.names = default_class_names()
         model.names = check_class_names(model.names)
+        if hasattr(model, "end2end"):
+            if self.args.end2end is not None:
+                model.end2end = self.args.end2end
+            if rknn or ncnn or executorch or paddle or imx or edgetpu:
+                # Disable end2end branch for certain export formats as they does not support topk
+                model.end2end = False
+                LOGGER.warning(f"{fmt.upper()} export does not support end2end models, disabling end2end branch.")
+            if engine and self.args.int8:
+                # TensorRT<=10.3.0 with int8 has known end2end build issues
+                # https://github.com/ultralytics/ultralytics/issues/23841
+                try:
+                    import tensorrt as trt
+
+                    if check_version(trt.__version__, "<=10.3.0", hard=True):
+                        model.end2end = False
+                        LOGGER.warning(
+                            "TensorRT<=10.3.0 with int8 has known end2end build issues, disabling end2end branch."
+                        )
+                except ImportError:
+                    pass
         if self.args.half and self.args.int8:
             LOGGER.warning("half=True and int8=True are mutually exclusive, setting half=False.")
             self.args.half = False
@@ -454,10 +488,7 @@ class Exporter:
             )
             model.clip_model = None  # openvino int8 export error: https://github.com/ultralytics/ultralytics/pull/18445
         if self.args.int8 and not self.args.data:
-            if axelera:
-                self.args.data = "coco128.yaml"  # Axelera default to coco128.yaml
-            else:
-                self.args.data = DEFAULT_CFG.data or TASK2DATA[getattr(model, "task", "detect")]  # assign default data
+            self.args.data = DEFAULT_CFG.data or TASK2DATA[getattr(model, "task", "detect")]  # assign default data
             LOGGER.warning(
                 f"INT8 export requires a missing 'data' arg for calibration. Using default 'data={self.args.data}'."
             )
@@ -496,6 +527,10 @@ class Exporter:
             from ultralytics.utils.export.tensorflow import tf_wrapper
 
             model = tf_wrapper(model)
+        if executorch:
+            from ultralytics.utils.export.executorch import executorch_wrapper
+
+            model = executorch_wrapper(model)
         for m in model.modules():
             if isinstance(m, Classify):
                 m.export = True
@@ -503,8 +538,12 @@ class Exporter:
                 m.dynamic = self.args.dynamic
                 m.export = True
                 m.format = self.args.format
-                m.max_det = self.args.max_det
+                # Clamp max_det to anchor count for small image sizes (required for TensorRT compatibility)
+                anchors = sum(int(self.imgsz[0] / s) * int(self.imgsz[1] / s) for s in model.stride.tolist())
+                m.max_det = min(self.args.max_det, anchors)
+                m.agnostic_nms = self.args.agnostic_nms
                 m.xyxy = self.args.nms and not coreml
+                m.shape = None  # reset cached shape for new export input size
                 if hasattr(model, "pe") and hasattr(m, "fuse"):  # for YOLOE models
                     m.fuse(model.pe.to(self.device))
             elif isinstance(m, C2f) and not is_tf_format:
@@ -543,6 +582,7 @@ class Exporter:
             "names": model.names,
             "args": {k: v for k, v in self.args if k in fmt_keys},
             "channels": model.yaml.get("channels", 3),
+            "end2end": getattr(model, "end2end", False),
         }  # model metadata
         if dla is not None:
             self.metadata["dla"] = dla  # make sure `AutoBackend` uses correct dla device if it has one
@@ -606,12 +646,11 @@ class Exporter:
                 f"work. Use export 'imgsz={max(self.imgsz)}' if val is required."
             )
             imgsz = self.imgsz[0] if square else str(self.imgsz)[1:-1].replace(" ", "")
-            predict_data = f"data={data}" if model.task == "segment" and pb else ""
             q = "int8" if self.args.int8 else "half" if self.args.half else ""  # quantization
             LOGGER.info(
                 f"\nExport complete ({time.time() - t:.1f}s)"
                 f"\nResults saved to {colorstr('bold', file.parent.resolve())}"
-                f"\nPredict:         yolo predict task={model.task} model={f} imgsz={imgsz} {q} {predict_data}"
+                f"\nPredict:         yolo predict task={model.task} model={f} imgsz={imgsz} {q}"
                 f"\nValidate:        yolo val task={model.task} model={f} imgsz={imgsz} data={data} {q} {s}"
                 f"\nVisualize:       https://netron.app"
             )
@@ -633,16 +672,18 @@ class Exporter:
             batch_size=self.args.batch,
         )
         n = len(dataset)
+        if n < 1:
+            raise ValueError(f"The calibration dataset must have at least 1 image, but found {n} images.")
+        batch = min(self.args.batch, n)
         if n < self.args.batch:
-            raise ValueError(
-                f"The calibration dataset ({n} images) must have at least as many images as the batch size "
-                f"('batch={self.args.batch}')."
+            LOGGER.warning(
+                f"{prefix} calibration dataset has only {n} images, reducing calibration batch size to {batch}."
             )
-        elif self.args.format == "axelera" and n < 100:
+        if self.args.format == "axelera" and n < 100:
             LOGGER.warning(f"{prefix} >100 images required for Axelera calibration, found {n} images.")
         elif self.args.format != "axelera" and n < 300:
             LOGGER.warning(f"{prefix} >300 images recommended for INT8 calibration, found {n} images.")
-        return build_dataloader(dataset, batch=self.args.batch, workers=0, drop_last=True)  # required for batch loading
+        return build_dataloader(dataset, batch=batch, workers=0, drop_last=True)  # required for batch loading
 
     @try_export
     def export_torchscript(self, prefix=colorstr("TorchScript:")):
@@ -689,6 +730,7 @@ class Exporter:
                 dynamic["output0"].pop(2)
         if self.args.nms and self.model.task == "obb":
             self.args.opset = opset  # for NMSModel
+            self.args.simplify = True  # fix OBB runtime error related to topk
 
         with arange_patch(self.args):
             torch2onnx(
@@ -772,15 +814,8 @@ class Exporter:
             fq_ov = str(Path(fq) / self.file.with_suffix(".xml").name)
             # INT8 requires nncf, nncf requires packaging>=23.2 https://github.com/openvinotoolkit/nncf/issues/3463
             check_requirements("packaging>=23.2")  # must be installed first to build nncf wheel
-            check_requirements("nncf>=2.14.0")
+            check_requirements("nncf>=2.14.0,<3.0.0" if not TORCH_2_3 else "nncf>=2.14.0")
             import nncf
-
-            def transform_fn(data_item) -> np.ndarray:
-                """Quantization transform function."""
-                data_item: torch.Tensor = data_item["img"] if isinstance(data_item, dict) else data_item
-                assert data_item.dtype == torch.uint8, "Input image must be uint8 for the quantization preprocessing"
-                im = data_item.numpy().astype(np.float32) / 255.0  # uint8 to fp16/32 and 0-255 to 0.0-1.0
-                return np.expand_dims(im, 0) if im.ndim == 3 else im
 
             # Generate calibration data for integer quantization
             ignored_scope = None
@@ -793,14 +828,13 @@ class Exporter:
                         f".*{head_module_name}/.*/Sub*",
                         f".*{head_module_name}/.*/Mul*",
                         f".*{head_module_name}/.*/Div*",
-                        f".*{head_module_name}\\.dfl.*",
                     ],
                     types=["Sigmoid"],
                 )
 
             quantized_ov_model = nncf.quantize(
                 model=ov_model,
-                calibration_dataset=nncf.Dataset(self.get_int8_calibration_dataloader(prefix), transform_fn),
+                calibration_dataset=nncf.Dataset(self.get_int8_calibration_dataloader(prefix), self._transform_fn),
                 preset=nncf.QuantizationPreset.MIXED,
                 ignored_scope=ignored_scope,
             )
@@ -819,11 +853,11 @@ class Exporter:
         assert not IS_JETSON, "Jetson Paddle exports not supported yet"
         check_requirements(
             (
-                "paddlepaddle-gpu"
+                "paddlepaddle-gpu>=3.0.0,<3.3.0"  # pin <3.3.0 https://github.com/PaddlePaddle/Paddle/issues/77340
                 if torch.cuda.is_available()
                 else "paddlepaddle==3.0.0"  # pin 3.0.0 for ARM64
                 if ARM64
-                else "paddlepaddle>=3.0.0",
+                else "paddlepaddle>=3.0.0,<3.3.0",  # pin <3.3.0 https://github.com/PaddlePaddle/Paddle/issues/77340
                 "x2paddle",
             )
         )
@@ -930,7 +964,7 @@ class Exporter:
             model = IOSDetectModel(self.model, self.im, mlprogram=not mlmodel) if self.args.nms else self.model
         else:
             if self.args.nms:
-                LOGGER.warning(f"{prefix} 'nms=True' is only available for Detect models like 'yolo11n.pt'.")
+                LOGGER.warning(f"{prefix} 'nms=True' is only available for Detect models like 'yolo26n.pt'.")
                 # TODO CoreML Segment and Pose model pipelining
             model = self.model
         ts = torch.jit.trace(model.eval(), self.im, strict=False)  # TorchScript model
@@ -999,12 +1033,15 @@ class Exporter:
         assert self.im.device.type != "cpu", "export running on CPU but must be on GPU, i.e. use 'device=0'"
         f_onnx = self.export_onnx()  # run before TRT import https://github.com/ultralytics/ultralytics/issues/7016
 
+        # Force re-install TensorRT on CUDA 13 ARM devices to 10.15.x versions for RT-DETR exports
+        # https://github.com/ultralytics/ultralytics/issues/22873
+        if is_jetson(jetpack=7) or is_dgx():
+            check_tensorrt("10.15")
+
         try:
             import tensorrt as trt
         except ImportError:
-            if LINUX:
-                cuda_version = torch.version.cuda.split(".")[0]
-                check_requirements(f"tensorrt-cu{cuda_version}>7.0.0,!=10.1.0")
+            check_tensorrt()
             import tensorrt as trt
         check_version(trt.__version__, ">=7.0.0", hard=True)
         check_version(trt.__version__, "!=10.1.0", msg="https://github.com/ultralytics/ultralytics/pull/14239")
@@ -1046,7 +1083,7 @@ class Exporter:
                 "onnx_graphsurgeon>=0.3.26",  # required by 'onnx2tf' package
                 "ai-edge-litert>=1.2.0" + (",<1.4.0" if MACOS else ""),  # required by 'onnx2tf' package
                 "onnx>=1.12.0,<2.0.0",
-                "onnx2tf>=1.26.3",
+                "onnx2tf>=1.26.3,<1.29.0",  # pin to avoid h5py build issues on aarch64
                 "onnxslim>=0.1.71",
                 "onnxruntime-gpu" if cuda else "onnxruntime",
                 "protobuf>=5",
@@ -1123,7 +1160,7 @@ class Exporter:
 
     @try_export
     def export_axelera(self, prefix=colorstr("Axelera:")):
-        """YOLO Axelera export."""
+        """Export YOLO model to Axelera format."""
         os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
         try:
             from axelera import compiler
@@ -1141,17 +1178,11 @@ class Exporter:
         from axelera import compiler
         from axelera.compiler import CompilerConfig
 
-        self.args.opset = 17
+        self.args.opset = 17  # hardcode opset for Axelera
         onnx_path = self.export_onnx()
-        model_name = f"{Path(onnx_path).stem}"
+        model_name = Path(onnx_path).stem
         export_path = Path(f"{model_name}_axelera_model")
         export_path.mkdir(exist_ok=True)
-
-        def transform_fn(data_item) -> np.ndarray:
-            data_item: torch.Tensor = data_item["img"] if isinstance(data_item, dict) else data_item
-            assert data_item.dtype == torch.uint8, "Input image must be uint8 for the quantization preprocessing"
-            im = data_item.numpy().astype(np.float32) / 255.0  # uint8 to fp16/32 and 0 - 255 to 0.0 - 1.0
-            return np.expand_dims(im, 0) if im.ndim == 3 else im
 
         if "C2PSA" in self.model.__str__():  # YOLO11
             config = CompilerConfig(
@@ -1178,7 +1209,7 @@ class Exporter:
             model=onnx_path,
             calibration_dataset=self.get_int8_calibration_dataloader(prefix),
             config=config,
-            transform_fn=transform_fn,
+            transform_fn=self._transform_fn,
         )
 
         compiler.compile(model=qmodel, config=config, output_dir=export_path)
@@ -1196,37 +1227,10 @@ class Exporter:
 
     @try_export
     def export_executorch(self, prefix=colorstr("ExecuTorch:")):
-        """Exports a model to ExecuTorch (.pte) format into a dedicated directory and saves the required metadata,
-        following Ultralytics conventions.
-        """
-        LOGGER.info(f"\n{prefix} starting export with ExecuTorch...")
-        assert TORCH_2_9, f"ExecuTorch export requires torch>=2.9.0 but torch=={TORCH_VERSION} is installed"
-        # TorchAO release compatibility table bug https://github.com/pytorch/ao/issues/2919
-        # Setuptools bug: https://github.com/pypa/setuptools/issues/4483
-        check_requirements("setuptools<71.0.0")  # Setuptools bug: https://github.com/pypa/setuptools/issues/4483
-        check_requirements(("executorch==1.0.1", "flatbuffers"))
-        # Pin numpy to avoid coremltools errors with numpy>=2.4.0, must be separate
-        check_requirements("numpy<=2.3.5")
-
-        from executorch.backends.xnnpack.partition.xnnpack_partitioner import XnnpackPartitioner
-        from executorch.exir import to_edge_transform_and_lower
-
-        file_directory = Path(str(self.file).replace(self.file.suffix, "_executorch_model"))
-        file_directory.mkdir(parents=True, exist_ok=True)
-
-        file_pte = file_directory / self.file.with_suffix(".pte").name
-        sample_inputs = (self.im,)
-
-        et_program = to_edge_transform_and_lower(
-            torch.export.export(self.model, sample_inputs), partitioner=[XnnpackPartitioner()]
-        ).to_executorch()
-
-        with open(file_pte, "wb") as file:
-            file.write(et_program.buffer)
-
-        YAML.save(file_directory / "metadata.yaml", self.metadata)
-
-        return str(file_directory)
+        """Export YOLO model to ExecuTorch *.pte format."""
+        assert TORCH_2_9, f"ExecuTorch requires torch>=2.9.0 but torch=={TORCH_VERSION} is installed"
+        check_executorch_requirements()
+        return torch2executorch(self.model, self.file, self.im, metadata=self.metadata, prefix=prefix)
 
     @try_export
     def export_edgetpu(self, tflite_model="", prefix=colorstr("Edge TPU:")):
@@ -1270,6 +1274,7 @@ class Exporter:
         LOGGER.info(f"\n{prefix} starting export with rknn-toolkit2...")
 
         check_requirements("rknn-toolkit2")
+        check_requirements("onnx<1.19.0")  # fix AttributeError: module 'onnx' has no attribute 'mapping'
         if IS_COLAB:
             # Prevent 'exit' from closing the notebook https://github.com/airockchip/rknn-toolkit2/issues/259
             import builtins
@@ -1278,6 +1283,7 @@ class Exporter:
 
         from rknn.api import RKNN
 
+        self.args.opset = min(self.args.opset or 19, 19)  # rknn-toolkit expects opset<=19
         f = self.export_onnx()
         export_path = Path(f"{Path(f).stem}_rknn_model")
         export_path.mkdir(exist_ok=True)
@@ -1286,8 +1292,7 @@ class Exporter:
         rknn.config(mean_values=[[0, 0, 0]], std_values=[[255, 255, 255]], target_platform=self.args.name)
         rknn.load_onnx(model=f)
         rknn.build(do_quantization=False)  # TODO: Add quantization support
-        f = f.replace(".onnx", f"-{self.args.name}.rknn")
-        rknn.export_rknn(f"{export_path / f}")
+        rknn.export_rknn(str(export_path / f"{Path(f).stem}-{self.args.name}.rknn"))
         YAML.save(export_path / "metadata.yaml", self.metadata)
         return export_path
 
@@ -1298,7 +1303,6 @@ class Exporter:
             "Export only supported on Linux."
             "See https://developer.aitrios.sony-semicon.com/en/docs/raspberry-pi-ai-camera/imx500-converter?version=3.17.3&progLang="
         )
-        assert not ARM64, "IMX export is not supported on ARM64 architectures."
         assert IS_PYTHON_MINIMUM_3_9, "IMX export is only supported on Python 3.9 or above."
 
         if getattr(self.model, "end2end", False):
@@ -1402,7 +1406,7 @@ class Exporter:
         nms.confidenceThresholdInputFeatureName = "confidenceThreshold"
         nms.iouThreshold = self.args.iou
         nms.confidenceThreshold = self.args.conf
-        nms.pickTop.perClass = True
+        nms.pickTop.perClass = not self.args.agnostic_nms
         nms.stringClassLabels.vector.extend(names.values())
         nms_model = ct.models.MLModel(nms_spec)
 
@@ -1441,6 +1445,14 @@ class Exporter:
         LOGGER.info(f"{prefix} pipeline success")
         return model
 
+    @staticmethod
+    def _transform_fn(data_item) -> np.ndarray:
+        """The transformation function for Axelera/OpenVINO quantization preprocessing."""
+        data_item: torch.Tensor = data_item["img"] if isinstance(data_item, dict) else data_item
+        assert data_item.dtype == torch.uint8, "Input image must be uint8 for the quantization preprocessing"
+        im = data_item.numpy().astype(np.float32) / 255.0  # uint8 to fp16/32 and 0 - 255 to 0.0 - 1.0
+        return im[None] if im.ndim == 3 else im
+
     def add_callback(self, event: str, callback):
         """Append the given callback to the specified event."""
         self.callbacks[event].append(callback)
@@ -1460,7 +1472,7 @@ class IOSDetectModel(torch.nn.Module):
         Args:
             model (torch.nn.Module): The YOLO model to wrap.
             im (torch.Tensor): Example input tensor with shape (B, C, H, W).
-            mlprogram (bool): Whether exporting to MLProgram format to fix NMS bug.
+            mlprogram (bool): Whether exporting to MLProgram format.
         """
         super().__init__()
         _, _, h, w = im.shape  # batch, channel, height, width
@@ -1493,7 +1505,7 @@ class NMSModel(torch.nn.Module):
 
         Args:
             model (torch.nn.Module): The model to wrap with NMS postprocessing.
-            args (Namespace): The export arguments.
+            args (SimpleNamespace): The export arguments.
         """
         super().__init__()
         self.model = model
@@ -1505,11 +1517,11 @@ class NMSModel(torch.nn.Module):
         """Perform inference with NMS post-processing. Supports Detect, Segment, OBB and Pose.
 
         Args:
-            x (torch.Tensor): The preprocessed tensor with shape (N, 3, H, W).
+            x (torch.Tensor): The preprocessed tensor with shape (B, C, H, W).
 
         Returns:
-            (torch.Tensor): List of detections, each an (N, max_det, 4 + 2 + extra_shape) Tensor where N is the number
-                of detections after NMS.
+            (torch.Tensor | tuple): Tensor of shape (B, max_det, 4 + 2 + extra_shape) where B is the batch size, or a
+                tuple of (detections, proto) for segmentation models.
         """
         from functools import partial
 
