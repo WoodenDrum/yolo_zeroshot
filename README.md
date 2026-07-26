@@ -8,6 +8,8 @@ This repository is a modified derivative of [Ultralytics](https://github.com/ult
 
 The paper-facing `STS` module is defined in `ultralytics/nn/modules/block.py`, exported by `ultralytics/nn/modules/__init__.py`, and registered for YAML model parsing in `ultralytics/nn/tasks.py`.
 
+For convenient review and reuse, the isolated paper module and its five paper configurations are also collected in [`3Spike/`](3Spike/). The runtime registration remains under `ultralytics/nn/modules/` so the supplied YAML files continue to work unchanged.
+
 The supplied paper configurations are:
 
 - `ultralytics/cfg/models/11/yolo11-spike-12.yaml`
